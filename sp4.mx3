@@ -1,0 +1,32 @@
+/*
+	Micromagnetic standard problem 4 (a) according to
+	http://www.ctcms.nist.gov/~rdm/mumag.org.html
+*/
+
+// geometry
+setgridsize(256, 64, 1)
+setcellsize(500e-9/256, 125e-9/64, 3e-9)
+
+// material
+Msat = 1600e3
+Aex = 13e-12
+
+Msat = 800e3
+alpha = 0.02
+m = uniform(1, .1, 0)
+
+tableadd(maxangle)
+
+relax()
+// tableautosave(10e-12)
+// autosave(m, 10e-12)
+B_ext = vector(-24.6E-3, 4.3E-3, 0)
+// run(5e-9)
+
+// save(m)
+ext_savecellcenterlocs()
+
+for t < 1e-9 {
+	ext_saverodrigues()
+	run(10e-12)
+}
