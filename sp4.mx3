@@ -27,6 +27,8 @@ B_ext = vector(-24.6E-3, 4.3E-3, 0)
 ext_savecellcenterlocs()
 
 for t < 1e-9 {
-	ext_saverodrigues()
+	ext_saverodriguesdiv()
 	run(10e-12)
 }
+
+print(sprintf("minDiv: %f, maxDiv: %f\n", minDiv, maxDiv))

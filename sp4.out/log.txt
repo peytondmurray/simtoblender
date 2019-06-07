@@ -19,9 +19,11 @@ relax()
 B_ext = vector(-24.6E-3, 4.3E-3, 0)
 ext_savecellcenterlocs()
 for t < 1e-9 {
-	ext_saverodrigues()
+	ext_saverodriguesdiv()
 	run(10e-12)
 }
+print(sprintf("minDiv: %f, maxDiv: %f\n", minDiv, maxDiv))
+//minDiv: -87799331.665039, maxDiv: 87798736.572266\n
 //********************************************************************//
 //Please cite the following references, relevant for your simulation: //
 //See bibtex file in output folder for justification.                 //
