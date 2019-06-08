@@ -1,0 +1,60 @@
+// Simulate motion of a domain wall in 2D.
+
+wall_start := now()
+
+// EdgeSpacing = 100
+AvoidEdges = false
+activitymaskwidth = 10
+DWHalfWidth = 12
+demagaccuracy = 12
+
+// Set up simulation; tuning parameters
+sim_time := 1e-08
+nx := 256
+ny := 256
+nz := 1
+dx := 1e-09
+dy := 1e-09
+dz := 4.000000000000001e-09
+Dind = 0.0              // [J/m^2] Interfacial DMI constant
+Dbulk = 0.0             // [J/m^2] Bulk DMI constant
+setGridSize(nx, ny, nz) // Size along y-direction is 1, since the wall is uniform
+setCellSize(dx, dy, dz)
+setPBC(0, 4, 0)
+
+// Material parameters with _ are varied across each grain to simulate pinning sites
+Msat = 9.1e5 // [A/m] Average saturation magnetization
+Ku1 = 8.4e5  // [J/m^3] Average anisotropy constant
+
+// Fixed material parameters
+Aex = 1.4e-11           // [J/m] Exchange stiffness
+anisU = Vector(0, 0, 1) // Uniaxial anisotropy direction
+alpha = 0.27            // Gilbert damping parameter
+
+// Set up bloch-type domain wall, with the wall magnetization pointing along (0, 1, 0), the +y direction
+// m = twoDomain(0, 0, 1, 0, 1, 0, 0, 0, -1)
+m = twoDomainBlochLines(0, 0, 1, 0, 0, -1)
+// relax()
+
+// print(sprintf("Mz: %E\n", m.comp(2).average()))
+shift(-50)
+// print(sprintf("Mz: %E\n", m.comp(2).average()))
+// ext_centerWall(2)
+
+// B := 0.40046705113314304 // [T] Field strength
+B := 0.020046705113314304 // [T] Field strength
+B_ext = vector(0, 0, B)
+// run(sim_time)
+
+tableadd(ext_exactdwposavg)
+tableadd(ext_exactdwvelavg)
+
+ext_savecellcenterlocs()
+
+for t < sim_time {
+	// print(sprintf("Mz: %E\n", m.comp(2).average()))
+	ext_saverodriguesdiv()
+	tablesave()
+	// save(m)
+	run(10e-12)
+}

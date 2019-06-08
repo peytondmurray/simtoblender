@@ -1,0 +1,49 @@
+//mumax 3.10 linux_amd64 go1.12.5 (gc)
+//CUDA 10010 GeForce GTX 1080 Ti(11177MB) cc6.1 , using CC 61  PTX
+//(c) Arne Vansteenkiste, Dynamat LAB, Ghent University, Belgium
+//This is free software without any warranty. See license.txt
+//********************************************************************//
+//  If you use mumax in any work or publication,                      //
+//  we kindly ask you to cite the references in references.bib        //
+//********************************************************************//
+//output directory: bloch_nucleation_mx.out/
+wall_start := now()
+AvoidEdges = false
+activitymaskwidth = 10
+DWHalfWidth = 12
+demagaccuracy = 12
+sim_time := 1e-08
+nx := 256
+ny := 256
+nz := 1
+dx := 1e-09
+dy := 1e-09
+dz := 4.000000000000001e-09
+Dind = 0.0
+Dbulk = 0.0
+setGridSize(nx, ny, nz)
+setCellSize(dx, dy, dz)
+setPBC(0, 4, 0)
+//resizing...
+Msat = 9.1e5
+Ku1 = 8.4e5
+Aex = 1.4e-11
+anisU = Vector(0, 0, 1)
+alpha = 0.27
+m = twoDomainBlochLines(0, 0, 1, 0, 0, -1)
+shift(-50)
+B := 0.020046705113314304
+B_ext = vector(0, 0, B)
+tableadd(ext_exactdwposavg)
+tableadd(ext_exactdwvelavg)
+ext_savecellcenterlocs()
+for t < sim_time {
+	ext_saverodriguesdiv()
+	tablesave()
+	run(10e-12)
+}
+//********************************************************************//
+//Please cite the following references, relevant for your simulation: //
+//See bibtex file in output folder for justification.                 //
+//********************************************************************//
+//   * Vansteenkiste et al., AIP Adv. 4, 107133 (2014).

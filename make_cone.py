@@ -2,7 +2,7 @@ import bpy
 import numpy as np
 
 root = '/home/pdmurray/Desktop/Workspace/simtoblender/'
-datadir = 'sp4.out/'
+datadir = 'bloch_nucleation_mx.out/'
 nframes = 100
 scaling = 5e7
 step = 39
@@ -57,21 +57,23 @@ for line in lines[i_start::step]:
     z.append(float(s[5])*scaling)
     
 # Generate a new cone mesh for each location. The name of the cones should be the Cone.###, where the number is the order in which it was added.
+bpy.ops.mesh.primitive_cone_add(vertices=vertices,radius1=radius,radius2=0.0,depth=length,location=(0, 0, 0))
+base_cone = bpy.context.active_object
+base_cone.name = f'base_cone'
+base_cone.rotation_mode = 'AXIS_ANGLE'
+
 for i, (_ix, _iy, _iz, _x, _y, _z) in enumerate(zip(ix, iy, iz, x, y, z)):
-    bpy.ops.mesh.primitive_cone_add(vertices=vertices,radius1=radius,radius2=0.0,depth=length,location=(_x, _y, _z))
-    bpy.context.active_object.name = f'Cone({_ix},{_iy},{_iz})'
-    bpy.context.active_object.rotation_mode = 'AXIS_ANGLE'
+    #bpy.ops.mesh.primitive_cone_add(vertices=vertices,radius1=radius,radius2=0.0,depth=length,location=(_x, _y, _z))
+    #bpy.context.active_object.name = f'Cone({_ix},{_iy},{_iz})'
+    #bpy.context.active_object.rotation_mode = 'AXIS_ANGLE'
+    m = base_cone.copy()
+    bpy.context.scene.collection.objects.link(m)
+    m.location = (_x, _y, _z)
     new_mat = bpy.data.materials.new(name=f'Cone({_ix},{_iy},{_iz})')
     new_mat.use_nodes = True
     bpy.context.active_object.data.materials.append(new_mat)
-#    new_mat.node_tree.nodes[1].inputs[0].default_value = colors[i] + [1] # Append on the alpha value
 
-
-#for i, _div_m in enumerate(np.linspace(min_div_m, max_div_m, len(colors))):
-#    new_mat = bpy.data.materials.new(name=f'cmap({_div_m})')
-#    new_mat.use_nodes = True
-#    new_mat.node_tree.nodes[1].inputs[0].default_value = colors[i] + [1] # Append on the alpha value
-
+bpy.data.objects.remove(base_cone)
 
 # Rotate and keyframe for each Rodrigues file
 for i in range(nframes):
@@ -98,6 +100,7 @@ for i in range(nframes):
 #    for object, axis, angle in zip(bpy.data.objects, axes, angles):
     for _ix, _iy, _iz, axis, angle, _div in list(zip(ix, iy, iz, axes, angles, div)):#[::step]:
         color = colors[np.argmin(np.abs(divergences - _div))]
+#        color = colors[(len(colors)-1)*int((np.max(div) - _div)/(np.max(div) - np.min(div)))]
         object = bpy.data.objects[f'Cone({_ix},{_iy},{_iz})']
         object.rotation_axis_angle = [angle, axis[0], axis[1], axis[2]]
         bpy.data.materials[f'Cone({_ix},{_iy},{_iz})'].node_tree.nodes[1].inputs[0].default_value = [color[0], color[1], color[2], 1]
