@@ -4,5 +4,5 @@ import cmocean
 
 #cmap = cmocean.cm.ice_r
 cmap = cm.get_cmap('RdBu_r')
-values = np.linspace(0.2, 0.8, 512)
+values = np.linspace(0, 1, 512)
 np.savetxt('colors.csv', cmap(values))
